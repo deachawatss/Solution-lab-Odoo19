@@ -8,6 +8,8 @@ set -euo pipefail
 : "${ODOO_DB_NAME:=solution_lab_odoo19}"
 : "${ODOO_MASTER_PASSWORD:?ODOO_MASTER_PASSWORD is required}"
 : "${ODOO_COMPANY_NAME:=Solution Lab}"
+: "${ODOO_PUBLIC_URL:=https://odoo.solutionlabth.com}"
+: "${ODOO_PROXY_MODE:=True}"
 
 cat > /etc/odoo/odoo.conf <<EOF
 [options]
@@ -21,7 +23,7 @@ http_interface = 0.0.0.0
 http_port = 8069
 addons_path = /opt/odoo/addons,/opt/odoo/odoo/addons
 list_db = True
-proxy_mode = False
+proxy_mode = ${ODOO_PROXY_MODE}
 without_demo = True
 EOF
 
@@ -112,7 +114,7 @@ import os
 company = env.ref("base.main_company", raise_if_not_found=False)
 if company and company.name != os.environ["ODOO_COMPANY_NAME"]:
     company.write({"name": os.environ["ODOO_COMPANY_NAME"]})
-env["ir.config_parameter"].sudo().set_param("web.base.url", "http://localhost:8069")
+env["ir.config_parameter"].sudo().set_param("web.base.url", os.environ["ODOO_PUBLIC_URL"])
 env.cr.commit()
 PY
 

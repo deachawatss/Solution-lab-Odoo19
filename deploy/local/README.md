@@ -19,6 +19,7 @@ The local `.env` file is intentionally ignored. Set local credentials there.
 - Postgres image: `postgres:latest`
 - Company: `Solution Lab`
 - Demo data: disabled
+- Autostart: enabled by Docker restart policies for the database and Odoo web services
 
 ## Cloudflare Tunnel
 

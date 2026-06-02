@@ -4,13 +4,15 @@ services:
   db:
     image: postgres:latest
     container_name: solution-lab-odoo19-db
+    restart: unless-stopped
     env_file:
       - .env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 5s
       timeout: 5s
-      retries: 30
+      retries: 60
+      start_period: 5m
     volumes:
       - postgres-18-data:/var/lib/postgresql
 
@@ -19,6 +21,7 @@ services:
       context: ../..
       dockerfile: deploy/local/Dockerfile
     container_name: solution-lab-odoo19-web
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -29,6 +32,12 @@ services:
     volumes:
       - ../..:/opt/odoo
       - odoo-data:/var/lib/odoo
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8069/web/login >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 10m
 
   cloudflared:
     image: cloudflare/cloudflared:latest

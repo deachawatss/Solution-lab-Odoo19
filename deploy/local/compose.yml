@@ -30,6 +30,19 @@ services:
       - ../..:/opt/odoo
       - odoo-data:/var/lib/odoo
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: solution-lab-odoo19-tunnel
+    profiles:
+      - cloudflare
+    depends_on:
+      odoo:
+        condition: service_started
+    env_file:
+      - .env
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
+
 volumes:
   postgres-18-data:
   odoo-data:

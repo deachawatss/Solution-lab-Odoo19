@@ -1,0 +1,35 @@
+name: solution-lab-odoo19
+
+services:
+  db:
+    image: postgres:latest
+    container_name: solution-lab-odoo19-db
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - postgres-18-data:/var/lib/postgresql
+
+  odoo:
+    build:
+      context: ../..
+      dockerfile: deploy/local/Dockerfile
+    container_name: solution-lab-odoo19-web
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "8069:8069"
+    volumes:
+      - ../..:/opt/odoo
+      - odoo-data:/var/lib/odoo
+
+volumes:
+  postgres-18-data:
+  odoo-data:
